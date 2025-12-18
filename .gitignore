@@ -7,3 +7,6 @@
 .Renviron
 .Rbuildignore
 .Rbuildignore
+*.Rproj
+.DS_Store
+man/
