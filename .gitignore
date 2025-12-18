@@ -9,3 +9,4 @@
 .Rbuildignore
 *.Rproj
 .DS_Store
+man/
