@@ -6,6 +6,8 @@ library(tibble)
 library(lubridate)
 library(purrr)
 
+#' Fetch data from arXiv API 
+#' #' @export
 fetch_arxiv_data <- function(categories = "cs.CR", 
                              max_results = 10, 
                              verbose = TRUE) {
@@ -53,6 +55,8 @@ fetch_arxiv_data <- function(categories = "cs.CR",
   return(parsed_data)
 }
 
+#' Filter cybersecurity publications 
+#' #' @export
 filter_cybersecurity <- function(data, strict_mode = FALSE) {
   
   if (is.null(data) || nrow(data) == 0) {
@@ -109,6 +113,8 @@ filter_cybersecurity <- function(data, strict_mode = FALSE) {
   return(filtered_data)
 }
 
+#' Save collected data to a file
+#' #' @export
 save_collected_data <- function(data, file_path, compress = TRUE) {
   
   if (is.null(data) || nrow(data) == 0) {
