@@ -149,3 +149,4 @@ result <- e2e_collect_and_store(
 - [`tests/TESTING.md`](tests/TESTING.md) - руководство по тестированию
 - [`tests/CATEGORIZATION_REPORT.md`](tests/CATEGORIZATION_REPORT.md) - отчёт о категоризации
 - `man/` - документация функций (roxygen2)
+## 
