@@ -1,11 +1,5 @@
-# Базовый образ с R
-FROM rocker/r-ver:4.4.0
+FROM rocker/r-ver:4.4.0 AS builder
 
-# Метаданные
-LABEL maintainer="your-email@example.com"
-LABEL description="Docker image for arxivThreatIntel R package"
-
-# Установка системных зависимостей
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
@@ -18,42 +12,24 @@ RUN apt-get update && apt-get install -y \
     libtiff5-dev \
     libjpeg-dev \
     git \
+    libgit2-dev \
+    libicu-dev \
+    libssh2-1-dev \
+    make \
+    g++ \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Установка R зависимостей
-RUN R -e "install.packages(c( \
-    'dplyr', \
-    'tidyr', \
-    'tibble', \
-    'arrow', \
-    'DBI', \
-    'duckdb', \
-    'httr', \
-    'xml2', \
-    'stringr', \
-    'lubridate', \
-    'purrr', \
-    'testthat', \
-    'roxygen2', \
-    'devtools', \
-    'remotes' \
-    ), repos='https://cloud.r-project.org/')"
+# Устанавливаем devtools и remotes
+RUN R -e "install.packages(c('remotes'), repos='https://cloud.r-project.org/')"
+RUN R -e "remotes::install_cran('devtools')"
 
-# Создание рабочей директории
-WORKDIR /app
+WORKDIR /build
 
-# Копирование файлов пакета
-COPY DESCRIPTION NAMESPACE ./
-COPY R/ ./R/
-COPY man/ ./man/
-COPY tests/ ./tests/
-COPY README.md ./
+COPY DESCRIPTION .
 
-# Создание необходимых директорий
-RUN mkdir -p data-raw inst/data
+RUN R -e "devtools::install_deps('.', dependencies = TRUE, upgrade = 'never')"
 
-# Установка пакета
-RUN R -e "devtools::install('.', dependencies=TRUE, upgrade='never')"
+COPY . .
 
-# Команда по умолчанию - запуск R
-CMD ["R"]
+RUN R CMD build .
