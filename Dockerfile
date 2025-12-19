@@ -11,20 +11,25 @@ RUN apt-get update && apt-get install -y \
     make g++ pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
-RUN R -e "install.packages(c('remotes'), repos='https://cloud.r-project.org/')"
+# Устанавливаем remotes/devtools для работы с зависимостями
+RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org/')"
 RUN R -e "remotes::install_cran('devtools')"
 
 WORKDIR /build
 
+# Сначала только DESCRIPTION — для кеширования зависимостей
 COPY DESCRIPTION .
+
+# Устанавливаем все Imports/Suggests из DESCRIPTION
 RUN R -e "devtools::install_deps('.', dependencies = TRUE, upgrade = 'never')"
 
+# Теперь копируем весь пакет
 COPY . .
 
-# Build tar.gz
+# Собираем tar.gz
 RUN R CMD build .
 
-# Install package into builder image
+# Устанавливаем пакет в builder-образ
 RUN R CMD INSTALL *.tar.gz
 
 
@@ -33,7 +38,8 @@ RUN R CMD INSTALL *.tar.gz
 # ============================
 FROM rocker/r-ver:4.4.0
 
-# Copy installed package
+# Копируем установленный пакет (и его зависимости) из builder-образа
 COPY --from=builder /usr/local/lib/R/site-library /usr/local/lib/R/site-library
 
+# Стартовая команда — просто R-консоль
 CMD ["R"]
