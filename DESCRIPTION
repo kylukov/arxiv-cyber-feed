@@ -1,0 +1,24 @@
+Package: arxivThreatIntel
+Type: Package
+Title: Threat Intelligence from arXiv
+Version: 0.1.0
+Description: Tools for collecting, storing, analyzing and visualizing arXiv publications in cybersecurity.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Imports:
+    dplyr,
+    tidyr,
+    tibble,
+    arrow,
+    DBI,
+    duckdb,
+    httr,
+    xml2,
+    stringr,
+    lubridate,
+    purrr
+Suggests:
+    testthat,
+    roxygen2
+RoxygenNote: 7.3.3
