@@ -26,6 +26,8 @@ RUN R -e "devtools::install_deps('.', dependencies = TRUE, upgrade = 'never')"
 # Теперь копируем весь пакет
 COPY . .
 
+RUN R -e "devtools::document()"
+
 # Собираем tar.gz
 RUN R CMD build .
 
