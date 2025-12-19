@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# R
+.Rhistory
+.RData
+.Rproj.user
+.Ruserdata
+.Rprofile
+.Renviron
+*.Rproj
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Data directories (can be mounted as volumes)
+data-raw/*
+inst/data/*
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation build artifacts
+docs/
+vignettes/*.html
+vignettes/*.R
+
+# Test artifacts
+tests/testthat/_snaps/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

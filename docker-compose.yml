@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  arxiv-threat-intel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arxiv-threat-intel
+    image: ghcr.io/${GITHUB_USERNAME}/arxiv-threat-intel:latest
+    volumes:
+      # Монтирование директорий для данных
+      - ./data-raw:/app/data-raw
+      - ./inst/data:/app/inst/data
+      # Монтирование кода для разработки (опционально)
+      - ./R:/app/R
+      - ./tests:/app/tests
+    environment:
+      - TZ=UTC
+    stdin_open: true
+    tty: true
+    command: R
+
+  # Сервис для запуска тестов
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arxiv-threat-intel-test
+    volumes:
+      - ./data-raw:/app/data-raw
+      - ./inst/data:/app/inst/data
+      - ./R:/app/R
+      - ./tests:/app/tests
+    environment:
+      - TZ=UTC
+    command: Rscript -e "testthat::test_dir('tests/testthat')"
+
+  # Сервис для запуска быстрых тестов
+  quick-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arxiv-threat-intel-quick-test
+    volumes:
+      - ./data-raw:/app/data-raw
+      - ./tests:/app/tests
+      - ./R:/app/R
+    environment:
+      - TZ=UTC
+    command: Rscript tests/manual/quick_test_categorization.R
