@@ -2,12 +2,10 @@
 % Please edit documentation in R/collect_data.R
 \name{save_collected_data}
 \alias{save_collected_data}
-\title{Save collected data to a file
-#' @export}
+\title{Save collected data to a file}
 \usage{
 save_collected_data(data, file_path, compress = TRUE)
 }
 \description{
 Save collected data to a file
-#' @export
 }

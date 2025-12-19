@@ -4,7 +4,10 @@
 \alias{run_collection_pipeline}
 \title{Run full collection and storage pipeline}
 \usage{
-run_collection_pipeline()
+run_collection_pipeline(
+  categorize = TRUE,
+  category_mode = c("primary", "multi")
+)
 }
 \description{
 Run full collection and storage pipeline

@@ -9,6 +9,8 @@ e2e_collect_and_store(
   max_results = 200,
   out = "data-raw",
   strict_mode = TRUE,
+  categorize = TRUE,
+  category_mode = c("primary", "multi"),
   use_duckdb = FALSE,
   duckdb_path = "inst/data/arxiv.duckdb",
   verbose = TRUE

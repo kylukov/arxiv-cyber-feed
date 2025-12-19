@@ -2,12 +2,10 @@
 % Please edit documentation in R/collect_data.R
 \name{fetch_arxiv_data}
 \alias{fetch_arxiv_data}
-\title{Fetch data from arXiv API 
-#' @export}
+\title{Fetch data from arXiv API}
 \usage{
 fetch_arxiv_data(categories = "cs.CR", max_results = 10, verbose = TRUE)
 }
 \description{
-Fetch data from arXiv API 
-#' @export
+Fetch data from arXiv API
 }

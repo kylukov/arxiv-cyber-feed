@@ -2,12 +2,10 @@
 % Please edit documentation in R/collect_data.R
 \name{filter_cybersecurity}
 \alias{filter_cybersecurity}
-\title{Filter cybersecurity publications 
-#' @export}
+\title{Filter cybersecurity publications}
 \usage{
 filter_cybersecurity(data, strict_mode = FALSE)
 }
 \description{
-Filter cybersecurity publications 
-#' @export
+Filter cybersecurity publications
 }
