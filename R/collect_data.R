@@ -40,8 +40,10 @@ fetch_arxiv_data <- function(categories = "cs.CR",
   
   response <- .execute_arxiv_api_request(search_query, max_results, verbose)
   
-  if (httr::http_error(response)) {
-    if (verbose) message("Не удалось подключиться к arXiv API")
+  # Защита от сетевых ошибок: если запрос вернул NULL или HTTP‑ошибку,
+  # возвращаем пустой tibble вместо падения с ошибкой http_error(NULL)
+  if (is.null(response) || httr::http_error(response)) {
+    if (verbose) message("Не удалось подключиться к arXiv API (сетевой сбой или ошибка ответа)")
     return(tibble::tibble())
   }
   
