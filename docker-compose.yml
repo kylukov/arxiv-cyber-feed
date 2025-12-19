@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: arxiv-threat-intel
-    image: ghcr.io/${GITHUB_USERNAME}/arxiv-threat-intel:latest
+    image: ghcr.io/kulikov/arxiv-threat-intel:latest
     volumes:
       # Монтирование директорий для данных
       - ./data-raw:/app/data-raw
