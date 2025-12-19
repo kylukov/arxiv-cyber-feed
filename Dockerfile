@@ -33,3 +33,4 @@ RUN R -e "devtools::install_deps('.', dependencies = TRUE, upgrade = 'never')"
 COPY . .
 
 RUN R CMD build .
+
