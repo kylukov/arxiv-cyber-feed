@@ -237,4 +237,28 @@ test_that("save_collected_data обрабатывает ошибки", {
   )
 })
 
+# 4. ТЕСТЫ ВСПОМОГАТЕЛЬНЫХ ФУНКЦИЙ
+
+test_that(".construct_arxiv_query формирует корректные запросы", {
+  expect_equal(.construct_arxiv_query("cs.CR"), "cat:cs.CR")
+  expect_equal(
+    .construct_arxiv_query(c("cs.CR", "cs.AI")),
+    "(cat:cs.CR OR cat:cs.AI)"
+  )
+  expect_equal(
+    .construct_arxiv_query(c("cs.CR", "cs.AI", "cs.NI")),
+    "(cat:cs.CR OR cat:cs.AI OR cat:cs.NI)"
+  )
+})
+
+test_that(".parse_datetime корректно парсит даты", {
+  test_date <- "2024-01-15T12:30:45Z"
+  parsed <- .parse_datetime(test_date)
+  
+  expect_s3_class(parsed, "POSIXct")
+  expect_equal(format(parsed, "%Y-%m-%d"), "2024-01-15")
+  
+  invalid <- .parse_datetime("not-a-date")
+  expect_true(is.na(invalid))
+})
 
