@@ -7,7 +7,6 @@ FROM rocker/r-ver:4.4.0 AS builder
 
 # ----------------------------
 # System dependencies
-# (только то, что нужно бинарникам)
 # ----------------------------
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -32,7 +31,7 @@ RUN --mount=type=cache,target=/root/.cache/R/pak \
     "
 
 # ----------------------------
-# Copy FULL package (важно!)
+# Copy FULL package
 # ----------------------------
 COPY DESCRIPTION NAMESPACE ./
 COPY R/ ./R/
@@ -40,8 +39,7 @@ COPY man/ ./man/
 COPY tests/ ./tests/
 
 # ----------------------------
-# Install package dependencies
-# (BINARIES ONLY)
+# Install deps via pak (BINARIES ONLY)
 # ----------------------------
 RUN --mount=type=cache,target=/root/.cache/R/pak \
     R -e " \
@@ -54,7 +52,7 @@ RUN --mount=type=cache,target=/root/.cache/R/pak \
         '.', \
         dependencies = c('Depends', 'Imports', 'Suggests') \
       ); \
-      pak::pkg_install(deps) \
+      pak::pkg_install(deps\$ref) \
     "
 
 # ----------------------------
@@ -75,18 +73,15 @@ RUN R CMD build . && \
 
 
 # ============================
-# Stage 2 — Runtime image
+# Stage 2 — Runtime
 # ============================
 FROM rocker/r-ver:4.4.0
 
 WORKDIR /app
 
-# Copy installed libraries from builder
 COPY --from=builder /usr/local/lib/R/site-library \
                      /usr/local/lib/R/site-library
 
-# Shiny
 EXPOSE 3838
 
-# Run dashboard
 CMD ["Rscript", "-e", "library(arxivThreatIntel); run_visual_dashboard(host='0.0.0.0', port=3838)"]
