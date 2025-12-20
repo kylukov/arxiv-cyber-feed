@@ -330,3 +330,18 @@ test_that("Операции выполняются за разумное вре�
 })
 
 
+# 7. ТЕСТЫ КРАЕВЫХ СЛУЧАЕВ
+
+
+test_that("Обработка краевых случаев", {
+  skip_if_offline()
+  skip_if(httr::http_error("http://export.arxiv.org"))
+  
+  minimal_data <- fetch_arxiv_data(max_results = 1, verbose = FALSE)
+  expect_lte(nrow(minimal_data), 1)
+  
+  if (interactive()) {  # Только в интерактивном режиме
+    large_data <- fetch_arxiv_data(max_results = 100, verbose = FALSE)
+    expect_lte(nrow(large_data), 100)
+  }
+})
