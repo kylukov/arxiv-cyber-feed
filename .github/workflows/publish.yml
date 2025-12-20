@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install system dependencies for devtools
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -32,6 +32,9 @@ jobs:
 
       - name: Install devtools
         run: R -e "install.packages('devtools', repos='https://cloud.r-project.org/')"
+
+      - name: Install package dependencies
+        run: R -e "devtools::install_deps(dependencies = TRUE)"
 
       - name: Generate documentation
         run: R -e "devtools::document()"
