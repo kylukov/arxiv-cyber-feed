@@ -5,7 +5,10 @@
 # ============================
 FROM rocker/r-ver:4.4.0 AS builder
 
-# System deps (минимальные, pak тянет бинарники)
+# ----------------------------
+# System dependencies
+# (только то, что нужно бинарникам)
+# ----------------------------
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
@@ -20,23 +23,25 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 WORKDIR /build
 
 # ----------------------------
-# Install pak (один раз)
+# Install pak
 # ----------------------------
 RUN --mount=type=cache,target=/root/.cache/R/pak \
     R -e " \
-      options(repos = c( \
-        CRAN = 'https://cloud.r-project.org' \
-      )); \
+      options(repos = c(CRAN = 'https://cloud.r-project.org')); \
       install.packages('pak', Ncpus = 2) \
     "
 
 # ----------------------------
-# Copy metadata first (cache!)
+# Copy FULL package (важно!)
 # ----------------------------
 COPY DESCRIPTION NAMESPACE ./
+COPY R/ ./R/
+COPY man/ ./man/
+COPY tests/ ./tests/
 
 # ----------------------------
-# Install deps via pak (BINARIES ONLY)
+# Install package dependencies
+# (BINARIES ONLY)
 # ----------------------------
 RUN --mount=type=cache,target=/root/.cache/R/pak \
     R -e " \
@@ -45,18 +50,12 @@ RUN --mount=type=cache,target=/root/.cache/R/pak \
         PAK_USE_BUNDLED_LIBRARIES = 'true' \
       ); \
       options(pkgType = 'binary'); \
-      pak::pkg_install( \
+      deps <- pak::local_deps( \
         '.', \
         dependencies = c('Depends', 'Imports', 'Suggests') \
-      ) \
+      ); \
+      pak::pkg_install(deps) \
     "
-
-# ----------------------------
-# Copy rest of package
-# ----------------------------
-COPY R/ ./R/
-COPY man/ ./man/
-COPY tests/ ./tests/
 
 # ----------------------------
 # Generate documentation
@@ -76,15 +75,18 @@ RUN R CMD build . && \
 
 
 # ============================
-# Stage 2 — Runtime
+# Stage 2 — Runtime image
 # ============================
 FROM rocker/r-ver:4.4.0
 
 WORKDIR /app
 
+# Copy installed libraries from builder
 COPY --from=builder /usr/local/lib/R/site-library \
                      /usr/local/lib/R/site-library
 
+# Shiny
 EXPOSE 3838
 
+# Run dashboard
 CMD ["Rscript", "-e", "library(arxivThreatIntel); run_visual_dashboard(host='0.0.0.0', port=3838)"]
