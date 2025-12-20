@@ -1,6 +1,7 @@
 # Git
 .git
 .gitignore
+.github/
 
 # R
 .Rhistory
@@ -10,6 +11,7 @@
 .Rprofile
 .Renviron
 *.Rproj
+.Rbuildignore
 
 # macOS
 .DS_Store
@@ -17,21 +19,27 @@
 .LSOverride
 
 # Data directories (can be mounted as volumes)
-data-raw/*
-inst/data/*
+data-raw/
+inst/data/
+*.parquet
+*.duckdb
 
 # Docker files
 Dockerfile
 docker-compose.yml
 .dockerignore
+DOCKER.md
 
 # Documentation build artifacts
 docs/
-vignettes/*.html
-vignettes/*.R
+vignettes/
+*.html
+*.pdf
 
 # Test artifacts
 tests/testthat/_snaps/
+tests/*.md
+tests/CATEGORIZATION_REPORT.md
 
 # IDE
 .vscode/
@@ -39,3 +47,14 @@ tests/testthat/_snaps/
 *.swp
 *.swo
 *~
+
+# Build artifacts
+*.tar.gz
+*.Rcheck/
+.Rcheck/
+
+# Images (not needed in container)
+images/
+
+# Scripts (not part of package)
+data_categorization.r
