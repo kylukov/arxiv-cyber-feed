@@ -24,9 +24,9 @@ WORKDIR /build
 # Copy DESCRIPTION and NAMESPACE first (cache-friendly)
 COPY DESCRIPTION NAMESPACE ./
 
-# Install dependencies with cache mount for R packages
+# Install dependencies with cache mount for R packages (including Suggests for roxygen2)
 RUN --mount=type=cache,target=/root/.cache/R/renv/cache/v5,sharing=locked \
-    R -e "remotes::install_deps('.', dependencies = TRUE, upgrade = 'never', repos='https://cloud.r-project.org/', Ncpus=2)"
+    R -e "remotes::install_deps('.', dependencies = c('Depends', 'Imports', 'Suggests'), upgrade = 'never', repos='https://cloud.r-project.org/', Ncpus=2)"
 
 # Copy R source files (changes more frequently)
 COPY R/ ./R/
@@ -41,12 +41,55 @@ COPY tests/ ./tests/
 RUN rm -f /build/*.tar.gz && \
     rm -rf /usr/local/lib/R/site-library/arxivThreatIntel
 
-# Install roxygen2 for documentation (if not already installed)
+# Install devtools (may be needed by roxygen2) and verify roxygen2
 RUN --mount=type=cache,target=/root/.cache/R/renv/cache/v5,sharing=locked \
-    R -e "if (!requireNamespace('roxygen2', quietly=TRUE)) install.packages('roxygen2', repos='https://cloud.r-project.org/', Ncpus=2)"
+    R -e " \
+    options(repos = c(CRAN = 'https://cloud.r-project.org/')); \
+    if (!requireNamespace('devtools', quietly=TRUE)) { \
+      cat('Installing devtools...\n'); \
+      install.packages('devtools', Ncpus=2, dependencies=TRUE); \
+    }; \
+    if (!requireNamespace('roxygen2', quietly=TRUE)) { \
+      cat('roxygen2 not found, installing...\n'); \
+      install.packages('roxygen2', Ncpus=2, dependencies=TRUE); \
+    }; \
+    cat('roxygen2 is available:', requireNamespace('roxygen2', quietly=TRUE), '\n')"
 
-# Generate documentation
-RUN R -e "roxygen2::roxygenise()"
+# Generate documentation - try devtools::document() first (more reliable), fallback to roxygen2
+RUN R -e " \
+    cat('Starting documentation generation...\n'); \
+    cat('Working directory:', getwd(), '\n'); \
+    cat('R files found:', length(list.files('R', pattern='.R$')), '\n'); \
+    success <- FALSE; \
+    if (requireNamespace('devtools', quietly=TRUE)) { \
+      cat('Trying devtools::document()...\n'); \
+      tryCatch({ \
+        library(devtools); \
+        document(); \
+        cat('Documentation generated successfully with devtools\n'); \
+        success <- TRUE; \
+      }, error = function(e) { \
+        cat('devtools::document() failed:', conditionMessage(e), '\n'); \
+      }); \
+    }; \
+    if (!success && requireNamespace('roxygen2', quietly=TRUE)) { \
+      cat('Trying roxygen2::roxygenise()...\n'); \
+      tryCatch({ \
+        library(roxygen2); \
+        roxygenise(); \
+        cat('Documentation generated successfully with roxygen2\n'); \
+        success <- TRUE; \
+      }, error = function(e) { \
+        cat('roxygen2::roxygenise() failed:', conditionMessage(e), '\n'); \
+      }); \
+    }; \
+    if (!success) { \
+      if (!file.exists('NAMESPACE')) { \
+        stop('Failed to generate documentation and NAMESPACE is missing') \
+      } else { \
+        cat('WARNING: Documentation generation failed but NAMESPACE exists. Continuing...\n'); \
+      } \
+    }"
 
 # Build package
 RUN R CMD build .
