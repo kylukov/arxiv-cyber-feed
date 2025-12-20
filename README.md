@@ -2,51 +2,19 @@
 
 Проект представляет собой R‑пакет для сбора, хранения и анализа научных публикаций из arxiv.org по темам информационной безопасности, threat intelligence и наступательной кибербезопасности. Цель — обогащение материалов киберразведки актуальными исследованиями и формирование тематического корпуса текстов.
 
-## Структура проекта
+## Инструкция по запуску
+### Для запуска пакета необходимо:
+1. Загрузить на устройсто актулаьный пакет
+2. Выполнить команду 
 ```
-arxiv-cyber-feed/
-├── DESCRIPTION                 # метаданные R‑пакета
-├── NAMESPACE                   # экспортируемые функции
-├── README.md                   # описание проекта
-├── .gitignore                  # исключения для git
-├── .dockerignore               # исключения для Docker
-├── .mailmap                    # нормализация авторов git
-│
-├── R/                          # основной код пакета
-│   ├── collect_data.R              # сбор данных из arXiv API
-│   ├── analysis_utils.R            # категоризация статей
-│   ├── storage_utils.R             # нормализация, Parquet, DuckDB
-│   ├── db_utils.R                  # работа с DuckDB
-│   ├── integration.R               # вспомогательные функции и пайплайны
-│   └── visualization.R             # визуализация (если появится)
-│
-├── data_categorization.r       # отдельный скрипт для тестов категоризации
-│
-├── data-raw/                   # сырые данные, parquet-файлы (в .gitignore)
-│
-├── inst/                       # дополнительные материалы
-│   ├── shiny-app/                  # Shiny-приложение (пока пустое)
-│   └── data/                       # база DuckDB (если создаётся)
-│
-├── man/                        # документация функций (roxygen2)
-│
-├── tests/                      # тесты пакета
-│   ├── README.md                   # документация по тестам
-│   ├── TESTING.md                  # руководство по тестированию
-│   ├── CATEGORIZATION_REPORT.md    # отчёт о качестве категоризации
-│   ├── testthat.R                  # конфигурация testthat
-│   ├── testthat/                   # unit‑тесты
-│   └── manual/                     # ручные интеграционные тесты
-│       ├── quick_test_categorization.R
-│       ├── test_functionality.R
-│       ├── test_categorization.R
-│       └── analyze_categorization_quality.R
-│
-│
-├── Dockerfile                  # контейнеризация
-├── docker-compose.yml          # оркестрация контейнеров
-└── DOCKER.md                   # документация по Docker
+docker run -p 3838:3838 <conainer-name>
 ```
+> При необходимости используйте права суперадминистратора (sudo) для запуска контейнера
+
+Где conainer-name - имя загруженного контейнера
+
+3. Обратитесь в веб интерфейс по адресу http://127.0.0.1:3838/
+
 
 ## Основные компоненты
 
@@ -94,3 +62,5 @@ arxiv-cyber-feed/
 
 ![alt text](images/image3.png)
 
+## License
+This project is licensed under the MIT License.
