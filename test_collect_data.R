@@ -175,3 +175,66 @@ test_that("filter_cybersecurity правильно сортирует по ко�
   expect_equal(filtered$arxiv_id[1], "2401.008")
   expect_equal(filtered$arxiv_id[3], "2401.006")
 })
+
+# 3. ТЕСТЫ ДЛЯ save_collected_data()
+
+
+test_that("save_collected_data сохраняет и загружает данные", {
+  test_data <- tibble(
+    arxiv_id = "2401.001",
+    title = "Test Publication",
+    abstract = "Test abstract content with security keywords",
+    authors = list(c("Test Author")),
+    categories = list(c("cs.CR")),
+    published_date = as.POSIXct("2024-01-01"),
+    doi = NA_character_,
+    collection_date = as.POSIXct("2024-01-01")
+  )
+  
+  temp_file <- tempfile(fileext = ".rds")
+  save_result <- save_collected_data(test_data, temp_file)
+  
+  expect_true(save_result)
+  expect_true(file.exists(temp_file))
+  
+  loaded_data <- readRDS(temp_file)
+  expect_equal(nrow(loaded_data), nrow(test_data))
+  expect_equal(loaded_data$arxiv_id, test_data$arxiv_id)
+  
+  unlink(temp_file)
+})
+
+test_that("save_collected_data создает директории", {
+  test_data <- tibble(
+    arxiv_id = "2401.002",
+    title = "Another Test",
+    abstract = "Abstract with encryption mentioned",
+    authors = list(c("Author")),
+    categories = list(c("cs.CR")),
+    published_date = as.POSIXct("2024-01-01"),
+    doi = NA_character_,
+    collection_date = as.POSIXct("2024-01-01")
+  )
+  
+  nested_path <- file.path(tempdir(), "test", "nested", "data.rds")
+  save_result <- save_collected_data(test_data, nested_path)
+  
+  expect_true(save_result)
+  expect_true(file.exists(nested_path))
+  
+  unlink(dirname(nested_path), recursive = TRUE)
+})
+
+test_that("save_collected_data обрабатывает ошибки", {
+  expect_warning(
+    save_collected_data(tibble(), "test.rds"),
+    "Экспорт не выполнен"
+  )
+  
+  expect_error(
+    save_collected_data(tibble(arxiv_id = "test"), ""),
+    "Не указан путь для сохранения файла"
+  )
+})
+
+
