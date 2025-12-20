@@ -108,3 +108,5 @@ docker run -p 3838:3838 <conainer-name>
 
 ![alt text](images/image3.png)
 
+## License
+This project is licensed under the MIT License.

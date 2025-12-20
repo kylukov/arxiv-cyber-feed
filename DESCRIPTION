@@ -24,3 +24,4 @@ Suggests:
     testthat,
     roxygen2
 RoxygenNote: 7.3.3
+License: MIT + file LICENSE
