@@ -262,3 +262,71 @@ test_that(".parse_datetime корректно парсит даты", {
   expect_true(is.na(invalid))
 })
 
+# 5. ИНТЕГРАЦИОННЫЕ ТЕСТЫ
+
+test_that("Полный ETL цикл работает корректно", {
+  skip_if_offline()
+  skip_if(httr::http_error("http://export.arxiv.org"))
+  
+  raw_data <- fetch_arxiv_data(
+    categories = "cs.CR",
+    max_results = 5,
+    verbose = FALSE
+  )
+  
+  if (nrow(raw_data) > 0) {
+    filtered <- filter_cybersecurity(raw_data, strict_mode = FALSE)
+    expect_lte(nrow(filtered), nrow(raw_data))
+    
+    temp_file <- tempfile(fileext = ".rds")
+    save_result <- save_collected_data(filtered, temp_file)
+    expect_true(save_result)
+    
+    if (file.exists(temp_file)) {
+      loaded <- readRDS(temp_file)
+      expect_equal(nrow(filtered), nrow(loaded))
+      unlink(temp_file)
+    }
+  }
+})
+
+test_that("Функции работают с реальными данными arXiv", {
+  skip_if_offline()
+  skip_if(httr::http_error("http://export.arxiv.org"))
+  
+  data <- fetch_arxiv_data(max_results = 3, verbose = FALSE)
+  
+  if (nrow(data) > 0) {
+    expect_true(all(grepl("^\\d{4}\\.\\d{4,5}", data$arxiv_id)))
+    
+    expect_false(all(is.na(data$published_date)))
+    
+    expect_true(all(sapply(data$authors, is.character)))
+    expect_true(all(sapply(data$categories, is.character)))
+    
+    expect_true(all(!is.na(data$collection_date)))
+  }
+})
+
+# 6. ТЕСТЫ ПРОИЗВОДИТЕЛЬНОСТИ
+
+test_that("Операции выполняются за разумное время", {
+  skip_if_offline()
+  skip_if(httr::http_error("http://export.arxiv.org"))
+  
+  time_result <- system.time({
+    fetch_arxiv_data(max_results = 2, verbose = FALSE)
+  })
+  
+  expect_lt(time_result["elapsed"], 10)
+  
+  data <- fetch_arxiv_data(max_results = 5, verbose = FALSE)
+  if (nrow(data) > 0) {
+    filter_time <- system.time({
+      filter_cybersecurity(data)
+    })
+    expect_lt(filter_time["elapsed"], 2)
+  }
+})
+
+
