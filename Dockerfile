@@ -3,6 +3,7 @@
 # ============================
 FROM rocker/r-ver:4.4.0 AS builder
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev libssl-dev libxml2-dev \
     libfontconfig1-dev libharfbuzz-dev libfribidi-dev \
@@ -11,27 +12,34 @@ RUN apt-get update && apt-get install -y \
     make g++ pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем remotes/devtools для работы с зависимостями
-RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org/')"
-RUN R -e "remotes::install_cran('devtools')"
+# Install devtools
+RUN R -e "install.packages('devtools', repos='https://cloud.r-project.org/')"
 
 WORKDIR /build
 
-# Сначала только DESCRIPTION — для кеширования зависимостей
+# Copy DESCRIPTION first (cache-friendly)
 COPY DESCRIPTION .
 
-# Устанавливаем все Imports/Suggests из DESCRIPTION
+# Install dependencies
 RUN R -e "devtools::install_deps('.', dependencies = TRUE, upgrade = 'never')"
 
-# Теперь копируем весь пакет
+# Copy full package
 COPY . .
 
+# ----------------------------
+# 🔥 CRITICAL FIX (Solution #3)
+# Remove any old tar.gz or installed package remnants
+# ----------------------------
+RUN rm -f /build/*.tar.gz
+RUN rm -rf /usr/local/lib/R/site-library/arxivThreatIntel
+
+# Force documentation regeneration
 RUN R -e "devtools::document()"
 
-# Собираем tar.gz
+# Build package
 RUN R CMD build .
 
-# Устанавливаем пакет в builder-образ
+# Install freshly built package
 RUN R CMD INSTALL *.tar.gz
 
 
@@ -40,8 +48,8 @@ RUN R CMD INSTALL *.tar.gz
 # ============================
 FROM rocker/r-ver:4.4.0
 
-# Копируем установленный пакет (и его зависимости) из builder-образа
+# Copy installed package from builder
 COPY --from=builder /usr/local/lib/R/site-library /usr/local/lib/R/site-library
 
-# Стартовая команда — просто R-консоль
+# Default command
 CMD ["R"]
