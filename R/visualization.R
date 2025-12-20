@@ -148,6 +148,7 @@ plot_publication_timeline <- function(data,
 #' @param port Порт для запуска (по умолчанию 3838)
 #'
 #' @return Ничего (блокирует R‑сессию, пока дашборд запущен)
+#' @export
 run_visual_dashboard <- function(host = "0.0.0.0", port = 3838) {
   ui <- shiny::fluidPage(
     shiny::tags$head(

@@ -18,7 +18,8 @@ Imports:
     stringr,
     lubridate,
     purrr,
-    ggplot2
+    ggplot2,
+    shiny
 Suggests:
     testthat,
     roxygen2

@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     container_name: arxiv-threat-intel
     image: ghcr.io/kulikov/arxiv-threat-intel:latest
+    ports:
+      - "3838:3838"
     volumes:
       # Монтирование директорий для данных
       - ./data-raw:/app/data-raw
@@ -16,9 +18,8 @@ services:
       - ./tests:/app/tests
     environment:
       - TZ=UTC
-    stdin_open: true
-    tty: true
-    command: R
+    # Default command запускает Shiny dashboard
+    # Для интерактивной R сессии используйте: docker-compose run arxiv-threat-intel R
 
   # Сервис для запуска тестов
   test:

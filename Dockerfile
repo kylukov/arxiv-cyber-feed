@@ -109,5 +109,8 @@ WORKDIR /app
 # Copy installed package from builder
 COPY --from=builder /usr/local/lib/R/site-library /usr/local/lib/R/site-library
 
-# Default command
-CMD ["R"]
+# Expose Shiny port
+EXPOSE 3838
+
+# Default command: start Shiny dashboard
+CMD ["Rscript", "-e", "library(arxivThreatIntel); run_visual_dashboard(host='0.0.0.0', port=3838)"]
