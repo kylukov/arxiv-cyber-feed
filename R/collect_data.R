@@ -1,3 +1,5 @@
+#' @importFrom dplyr %>%
+
 library(httr)
 library(xml2)
 library(dplyr)
