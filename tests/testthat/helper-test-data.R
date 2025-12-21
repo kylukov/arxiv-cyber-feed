@@ -149,14 +149,56 @@ get_normalized_tables_primary <- function() {
 }
 
 mock_http_response <- function(content, status_code = 200) {
-  structure(
+  headers <- structure(
+    list("content-type" = "application/xml"),
+    class = c("insensitive", "list")
+  )
+  
+  response <- structure(
     list(
-      status_code = status_code,
-      headers = list("content-type" = "application/xml"),
-      content = charToRaw(content)
+      url = "http://export.arxiv.org/api/query",
+      status_code = as.integer(status_code),
+      headers = headers,
+      all_headers = list(
+        list(
+          status = as.integer(status_code),
+          version = "HTTP/1.1",
+          headers = headers
+        )
+      ),
+      cookies = structure(
+        data.frame(
+          domain = character(0),
+          flag = logical(0),
+          path = character(0),
+          secure = logical(0),
+          expiration = as.POSIXct(character(0)),
+          name = character(0),
+          value = character(0),
+          stringsAsFactors = FALSE
+        ),
+        row.names = integer(0)
+      ),
+      content = charToRaw(content),
+      date = Sys.time(),
+      times = c(redirect = 0, namelookup = 0, connect = 0, pretransfer = 0, starttransfer = 0, total = 0),
+      request = structure(
+        list(
+          method = "GET",
+          url = "http://export.arxiv.org/api/query",
+          headers = character(0),
+          fields = NULL,
+          options = list(useragent = "test", httpget = TRUE),
+          auth_token = NULL,
+          output = structure(list(), class = c("write_memory", "write_function"))
+        ),
+        class = "request"
+      ),
+      handle = NULL
     ),
     class = "response"
   )
+  response
 }
 
 get_non_security_data <- function() {

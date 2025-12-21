@@ -200,6 +200,7 @@ test_that("query_articles filters by category", {
 })
 
 test_that("e2e_collect_and_store executes full pipeline", {
+  skip_if_not_installed("mockery")
   xml_content <- get_sample_arxiv_xml()
   mock_response <- mock_http_response(xml_content)
   
@@ -230,6 +231,7 @@ test_that("e2e_collect_and_store executes full pipeline", {
 })
 
 test_that("e2e_collect_and_store works with duckdb option", {
+  skip_if_not_installed("mockery")
   mockery::stub(
     e2e_collect_and_store,
     "fetch_arxiv_data",

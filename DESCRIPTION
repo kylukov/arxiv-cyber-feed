@@ -22,5 +22,6 @@ Imports:
     shiny
 Suggests:
     testthat,
-    roxygen2
+    roxygen2,
+    mockery
 RoxygenNote: 7.3.3

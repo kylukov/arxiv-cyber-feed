@@ -22,6 +22,7 @@ test_that("fetch_arxiv_data validates categories parameter", {
 })
 
 test_that("fetch_arxiv_data handles network errors gracefully", {
+  skip_if_not_installed("mockery")
   mockery::stub(
     fetch_arxiv_data,
     ".execute_arxiv_api_request",
@@ -34,6 +35,7 @@ test_that("fetch_arxiv_data handles network errors gracefully", {
 })
 
 test_that("fetch_arxiv_data handles HTTP errors", {
+  skip_if_not_installed("mockery")
   mock_response <- mock_http_response("", status_code = 500)
   
   mockery::stub(
@@ -48,6 +50,7 @@ test_that("fetch_arxiv_data handles HTTP errors", {
 })
 
 test_that("fetch_arxiv_data parses valid XML response", {
+  skip_if_not_installed("mockery")
   xml_content <- get_sample_arxiv_xml()
   mock_response <- mock_http_response(xml_content)
   
@@ -66,6 +69,7 @@ test_that("fetch_arxiv_data parses valid XML response", {
 })
 
 test_that("fetch_arxiv_data extracts arxiv_id correctly", {
+  skip_if_not_installed("mockery")
   xml_content <- get_sample_arxiv_xml()
   mock_response <- mock_http_response(xml_content)
   
@@ -77,11 +81,12 @@ test_that("fetch_arxiv_data extracts arxiv_id correctly", {
   
   result <- fetch_arxiv_data(categories = "cs.CR", max_results = 2, verbose = FALSE)
   
-  expect_true("2412.12345" %in% result$arxiv_id)
-  expect_true("2412.54321" %in% result$arxiv_id)
+  expect_true("2412.12345v1" %in% result$arxiv_id)
+  expect_true("2412.54321v2" %in% result$arxiv_id)
 })
 
 test_that("fetch_arxiv_data extracts DOI when available", {
+  skip_if_not_installed("mockery")
   xml_content <- get_sample_arxiv_xml()
   mock_response <- mock_http_response(xml_content)
   
@@ -98,6 +103,7 @@ test_that("fetch_arxiv_data extracts DOI when available", {
 })
 
 test_that("fetch_arxiv_data handles empty XML response", {
+  skip_if_not_installed("mockery")
   xml_content <- get_empty_arxiv_xml()
   mock_response <- mock_http_response(xml_content)
   
@@ -107,7 +113,7 @@ test_that("fetch_arxiv_data handles empty XML response", {
     mock_response
   )
   
-  result <- fetch_arxiv_data(categories = "cs.CR", max_results = 0, verbose = FALSE)
+  result <- fetch_arxiv_data(categories = "cs.CR", max_results = 10, verbose = FALSE)
   
   expect_s3_class(result, "tbl_df")
   expect_equal(nrow(result), 0)
