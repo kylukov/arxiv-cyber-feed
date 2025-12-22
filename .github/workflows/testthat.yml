@@ -1,17 +1,20 @@
-name: R testthat
+name: R testthat (pak)
 
 on:
   push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   testthat:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: read
+
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up R
@@ -24,12 +27,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
 
-      - name: Install R package dependencies
+      - name: Install pak
         run: |
-          Rscript -e 'install.packages(c(
+          Rscript -e 'install.packages("pak", repos = "https://cloud.r-project.org")'
+
+      - name: Install R dependencies via pak
+        run: |
+          Rscript -e 'pak::pkg_install(c(
             "testthat","dplyr","tidyr","tibble","purrr",
             "stringr","httr","xml2","lubridate","arrow","DBI","duckdb"
-          ), repos = "https://cloud.r-project.org")'
+          ))'
 
       - name: Run testthat tests
         env:
