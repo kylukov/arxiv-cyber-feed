@@ -1,0 +1,42 @@
+name: R testthat
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  testthat:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+
+      - name: Install R package dependencies
+        run: |
+          Rscript -e 'install.packages(c(
+            "devtools","testthat","dplyr","tidyr","tibble","purrr",
+            "stringr","httr","xml2","lubridate","arrow","DBI","duckdb"
+          ), repos = "https://cloud.r-project.org")'
+
+      - name: Install package
+        run: |
+          Rscript -e 'devtools::install(".", dependencies = TRUE)'
+
+      - name: Run testthat tests
+        env:
+          NOT_CRAN: true
+        run: |
+          Rscript -e 'devtools::test()'
