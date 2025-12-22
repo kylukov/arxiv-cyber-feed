@@ -27,16 +27,12 @@ jobs:
       - name: Install R package dependencies
         run: |
           Rscript -e 'install.packages(c(
-            "devtools","testthat","dplyr","tidyr","tibble","purrr",
+            "testthat","dplyr","tidyr","tibble","purrr",
             "stringr","httr","xml2","lubridate","arrow","DBI","duckdb"
           ), repos = "https://cloud.r-project.org")'
-
-      - name: Install package
-        run: |
-          Rscript -e 'devtools::install(".", dependencies = TRUE)'
 
       - name: Run testthat tests
         env:
           NOT_CRAN: true
         run: |
-          Rscript -e 'devtools::test()'
+          Rscript -e 'testthat::test_dir("tests/testthat")'
