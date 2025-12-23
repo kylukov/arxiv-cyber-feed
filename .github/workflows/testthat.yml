@@ -33,13 +33,11 @@ jobs:
 
       - name: Install R dependencies via pak
         run: |
-          Rscript -e 'pak::pkg_install(c(
-            "testthat","dplyr","tidyr","tibble","purrr",
-            "stringr","httr","xml2","lubridate","arrow","DBI","duckdb"
-          ))'
+          Rscript -e 'pak::pkg_install("testthat")'
+          Rscript -e 'pak::local_install(dependencies = TRUE)'
 
       - name: Run testthat tests
         env:
           NOT_CRAN: true
         run: |
-          Rscript -e 'testthat::test_dir("tests/testthat")'
+          Rscript -e 'testthat::test_local("tests/testthat")'
