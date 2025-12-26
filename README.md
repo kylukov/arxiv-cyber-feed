@@ -11,7 +11,6 @@ install.packages("remotes")
 3. Склонировать и установить пакет с гитхаба 
 ```
 remotes::install_github("kylukov/arxiv-cyber-feed")
-
 ```
 
 ## Основные компоненты
